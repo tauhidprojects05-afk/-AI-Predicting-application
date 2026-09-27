@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Result | Student Performance AI{% endblock %}
+
+{% block content %}
+<div class="card">
+  {% if error %}
+    <h1>Something went wrong</h1>
+    <p class="error">{{ error }}</p>
+    <a class="btn-link" href="{{ url_for('index') }}">Try again</a>
+  {% else %}
+    <span class="report-eyebrow">Prediction Report</span>
+    <h2 class="report-name">{{ record.name }}</h2>
+
+    <div class="report-card {{ 'at-risk' if record.at_risk else 'clear' }}">
+      <div class="gauge-wrap">
+        <svg class="gauge" viewBox="0 0 160 160" role="img" aria-label="Confidence score {{ record.confidence }} percent">
+          <circle class="gauge-track" cx="80" cy="80" r="70"></circle>
+          <circle class="gauge-fill" cx="80" cy="80" r="70" data-confidence="{{ record.confidence }}"></circle>
+        </svg>
+        <div class="gauge-center">
+          <span class="gauge-value">{{ record.confidence }}%</span>
+          <span class="gauge-caption">confidence</span>
+        </div>
+      </div>
+
+      <div class="verdict-row">
+        <span class="verdict-label">Predicted performance</span>
+        <span class="verdict-value">{{ record.performance }}</span>
+      </div>
+
+      <div class="stamp {{ 'stamp-risk' if record.at_risk else 'stamp-clear' }}">
+        {% if record.at_risk %}
+          Early warning — recommend intervention
+        {% else %}
+          No immediate risk flagged
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="input-summary">
+      <h3>Input details</h3>
+      <ul>
+        <li><span>Attendance</span><span>{{ record.attendance }}%</span></li>
+        <li><span>Previous grade</span><span>{{ record.previous_grade }}%</span></li>
+        <li><span>Weekly study hours</span><span>{{ record.study_hours }}</span></li>
+        <li><span>Assignments completed</span><span>{{ record.assignments_completed }}%</span></li>
+      </ul>
+    </div>
+
+    <a class="btn-link" href="{{ url_for('index') }}">Predict another student</a>
+    <a class="btn-link secondary" href="{{ url_for('history') }}">View history</a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if not error %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const fill = document.querySelector(".gauge-fill");
+    if (fill) {
+      const circumference = 2 * Math.PI * 70;
+      const pct = Math.max(0, Math.min(100, parseFloat(fill.dataset.confidence) || 0));
+      const target = circumference - (pct / 100) * circumference;
+      fill.style.strokeDasharray = circumference;
+      fill.style.strokeDashoffset = circumference;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          fill.style.strokeDashoffset = target;
+        });
+      });
+    }
+    const stamp = document.querySelector(".stamp");
+    if (stamp) {
+      setTimeout(() => stamp.classList.add("stamp-in"), 550);
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

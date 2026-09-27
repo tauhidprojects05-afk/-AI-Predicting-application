@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}History | Student Performance AI{% endblock %}
+
+{% block content %}
+<div class="card wide">
+  <h1>Prediction History</h1>
+
+  {% if records|length == 0 %}
+    <p class="subtitle">No predictions yet. <a href="{{ url_for('index') }}">Make one now</a>.</p>
+  {% else %}
+    <div class="table-scroll">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Attendance</th>
+            <th>Prev. grade</th>
+            <th>Study hrs</th>
+            <th>Assignments</th>
+            <th>Result</th>
+            <th>Confidence</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr class="{{ 'at-risk-row' if r.at_risk else '' }}">
+            <td>{{ r.name }}</td>
+            <td>{{ r.attendance }}%</td>
+            <td>{{ r.previous_grade }}%</td>
+            <td>{{ r.study_hours }}</td>
+            <td>{{ r.assignments_completed }}%</td>
+            <td><span class="result-pill {{ 'risk' if r.at_risk else 'ok' }}">{{ r.performance }}</span></td>
+            <td>{{ r.confidence }}%</td>
+            <td>{{ r.timestamp }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

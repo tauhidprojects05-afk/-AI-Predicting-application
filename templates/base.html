@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Student Performance AI{% endblock %}</title>
+  <link rel="manifest" href="{{ url_for('manifest') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <meta name="theme-color" content="#1f2c56" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">Student Performance AI</div>
+    <div class="nav-links">
+      <a href="{{ url_for('index') }}" {% if request.path == url_for('index') %}aria-current="page"{% endif %}>Predict</a>
+      <a href="{{ url_for('history') }}" {% if request.path == url_for('history') %}aria-current="page"{% endif %}>History</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>AI-Based Student Performance Prediction &amp; Early Warning System</p>
+  </footer>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("{{ url_for('service_worker') }}")
+          .then(() => console.log("Service worker registered"))
+          .catch((err) => console.error("SW registration failed:", err));
+      });
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
